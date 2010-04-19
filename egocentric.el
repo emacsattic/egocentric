@@ -1,10 +1,10 @@
 ;;; @(#) egocentric.el --- highlight your name inside emacs buffers
 
-;;; @(#) $Id: egocentric.el,v 1.1.1.1 2002/07/01 17:04:37 benj Exp $
+;;; @(#) $Id: egocentric.el,v 1.3 2010/04/08 22:12:15 benj Exp $
 
 ;; This file is *NOT* part of GNU Emacs.
 
-;; Copyright (C) 2001 by Benjamin Drieu
+;; Copyright (C) 2001-2010 by Benjamin Drieu
 ;; Author:	 Benjamin Drieu <bdrieu@april.org>
 ;; Maintainer:	 Benjamin Drieu <bdrieu@april.org>
 ;; Created:	 2001-04-23
@@ -13,7 +13,7 @@
 ;; LCD Archive Entry:
 ;; egocentric|Benjamin Drieu|bdrieu@april.org|
 ;; Highlight occurences of your name in buffers|
-;; 23-Apr-2001|$Revision: 1.1.1.1 $|~/misc/egocentric.el|
+;; 23-Apr-2001|$Revision: 1.3 $|~/misc/egocentric.el|
 
 ;; This program is free software; you can redistribute it and/or
 ;; modify it under the terms of the GNU General Public License as
@@ -65,12 +65,12 @@
 
 (defcustom egocentric-additional-keywords nil
   "*Additionnal keywords to highlight added by user."
-  :type 'list
+  :type '(choice (const nil) (repeat string))
   :group 'egocentric)
 
 (defcustom egocentric-additional-regexps nil
   "*Additionnal regexps to highlight added by user."
-  :type 'list
+  :type '(choice (const nil) (repeat string))
   :group 'egocentric)
 
 (defcustom egocentric-accents-translation-alist
@@ -79,7 +79,7 @@
     ("ê" . "\\(e\\|ê\\|=EA\\)")
     ("ï" . ,(concat "\\(i\\|ï\\|=EF\\)"))) ; [TODO] contribute here ;-)
   "Translation from accents to ''generic'' regexps."
-  :type 'list
+  :type 'alist
   :group 'egocentric)
 
 
