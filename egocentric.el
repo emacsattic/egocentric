@@ -1,6 +1,6 @@
 ;;; @(#) egocentric.el --- highlight your name inside emacs buffers
 
-;;; @(#) $Id: egocentric.el,v 1.3 2010/04/08 22:12:15 benj Exp $
+;;; @(#) $Id: egocentric.el,v 1.5 2010/10/25 10:10:08 benj Exp $
 
 ;; This file is *NOT* part of GNU Emacs.
 
@@ -13,7 +13,7 @@
 ;; LCD Archive Entry:
 ;; egocentric|Benjamin Drieu|bdrieu@april.org|
 ;; Highlight occurences of your name in buffers|
-;; 23-Apr-2001|$Revision: 1.3 $|~/misc/egocentric.el|
+;; 23-Apr-2001|$Revision: 1.5 $|~/misc/egocentric.el|
 
 ;; This program is free software; you can redistribute it and/or
 ;; modify it under the terms of the GNU General Public License as
@@ -39,9 +39,13 @@
 ;; use egocentric.el with Gnus, simply use the following inside your
 ;; Gnus init file.
 ;;
-;; (add-hook 'gnus-article-prepare-hook 'egocentric-mode)
+;; (add-hook 'gnus-article-prepare-hook 'egocentric-mode-on)
 ;; (autoload 'egocentric-mode "egocentric"
 ;;           "Highlight your name or various keywords in buffers")
+;; 
+;; If you do not want your own mails to be highlighted when reading
+;; messages, you might like to use egocentric-mode-maybe and customize
+;; the egocentric-email-address-to-ignore variable instead.
 
 ;;; To do:
 
@@ -80,6 +84,11 @@
     ("ï" . ,(concat "\\(i\\|ï\\|=EF\\)"))) ; [TODO] contribute here ;-)
   "Translation from accents to ''generic'' regexps."
   :type 'alist
+  :group 'egocentric)
+
+(defcustom egocentric-email-address-to-ignore ""
+  "Do not highlight mails from yourself.  If set, matching emails will not highlight."
+  :type '(string)
   :group 'egocentric)
 
 
@@ -125,16 +134,14 @@ This is definitively *gruuuuuik*")
   "Toggle egocentric mode.
 Optional argument ARG is an optional boolean controling whether egocentric-mode should be turned on/off."
   (interactive "P")
-  
-  (let ((old-egocentric-mode egocentric-mode))
-    ;; Mark the mode as on or off.
-    (setq egocentric-mode (not (or (and (null arg) egocentric-mode)
-				   (<= (prefix-numeric-value arg) 0))))
+  ;; Choose if the mode has to be on or off.
+  (let ((new-egocentric-mode (not (or (and (null arg) egocentric-mode)
+                                      (<= (prefix-numeric-value arg) 0)))))
     ;; Do the real work.
-    (unless (eq egocentric-mode old-egocentric-mode)
+    (unless (eq egocentric-mode new-egocentric-mode)
       (if egocentric-mode
 	  (egocentric-mode-on)
-      (egocentric-mode-off)))))
+        (egocentric-mode-off)))))
 
 
 ;;;###autoload
@@ -145,7 +152,8 @@ Optional argument ARG is an optional boolean controling whether egocentric-mode 
   (add-hook 'post-command-hook (function egocentric-post-command-hook) t t)
   (egocentric-update-regexp-list)
   (egocentric-insinuate egocentric-regexp-list)
-  (run-hooks 'egocentric-mode-hook))
+  (run-hooks 'egocentric-mode-hook)
+  (setq egocentric-mode t))
 
 
 ;;;###autoload
@@ -162,6 +170,18 @@ Optional argument ARG is an optional boolean controling whether egocentric-mode 
   "Update ``egocentric-regexp-list'' from $USER and $NAME variables."
   (interactive)
   (setq egocentric-regexp-list (egocentric-make-regexp-list)))
+
+
+;;;###autoload
+(defun egocentric-mode-maybe ()
+  (interactive)
+  (if (not
+       (and egocentric-email-address-to-ignore
+	    (string-match
+	     egocentric-email-address-to-ignore
+	     (mail-header-from gnus-current-headers))))
+      (egocentric-mode-on)))
+
 
 
 (defun egocentric-make-regexp-list ()
