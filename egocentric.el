@@ -1,6 +1,6 @@
 ;;; @(#) egocentric.el --- highlight your name inside emacs buffers
 
-;;; @(#) $Id: egocentric.el,v 1.5 2010/10/25 10:10:08 benj Exp $
+;;; @(#) $Id: egocentric.el,v 1.6 2011/01/22 14:44:08 benj Exp $
 
 ;; This file is *NOT* part of GNU Emacs.
 
@@ -13,7 +13,7 @@
 ;; LCD Archive Entry:
 ;; egocentric|Benjamin Drieu|bdrieu@april.org|
 ;; Highlight occurences of your name in buffers|
-;; 23-Apr-2001|$Revision: 1.5 $|~/misc/egocentric.el|
+;; 23-Apr-2001|$Revision: 1.6 $|~/misc/egocentric.el|
 
 ;; This program is free software; you can redistribute it and/or
 ;; modify it under the terms of the GNU General Public License as
@@ -148,7 +148,10 @@ Optional argument ARG is an optional boolean controling whether egocentric-mode 
 (defun egocentric-mode-on ()
   "Turn Egocentric mode on."
   (interactive)
-  (make-local-hook 'post-command-hook)
+  (unless (or (> emacs-major-version 21)
+	  (and (= emacs-major-version 21)
+		(>= emacs-minor-version 1)))
+      (make-local-hook 'post-command-hook))
   (add-hook 'post-command-hook (function egocentric-post-command-hook) t t)
   (egocentric-update-regexp-list)
   (egocentric-insinuate egocentric-regexp-list)
